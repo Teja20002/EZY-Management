@@ -1,0 +1,6 @@
+module Pods_EZY_Management {
+  umbrella header "Pods-EZY-Management-umbrella.h"
+
+  export *
+  module * { export * }
+}

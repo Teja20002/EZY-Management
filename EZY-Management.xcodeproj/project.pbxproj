@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		0567E1154C186894A0764CD2 /* libPods-EZY-Management.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6896563682BAF9D4D2C4C0C2 /* libPods-EZY-Management.a */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		0F5BDE012CDE477800D4E39B /* EZY-Management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "EZY-Management.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		14D87AC8C09AC22C84885F9F /* Pods-EZY-Management.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EZY-Management.release.xcconfig"; path = "Target Support Files/Pods-EZY-Management/Pods-EZY-Management.release.xcconfig"; sourceTree = "<group>"; };
+		6896563682BAF9D4D2C4C0C2 /* libPods-EZY-Management.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-EZY-Management.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9E998B79A4B7193BE43A7EAF /* Pods-EZY-Management.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-EZY-Management.debug.xcconfig"; path = "Target Support Files/Pods-EZY-Management/Pods-EZY-Management.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0567E1154C186894A0764CD2 /* libPods-EZY-Management.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,6 +55,8 @@
 			children = (
 				0F5BDE032CDE477800D4E39B /* EZY-Management */,
 				0F5BDE022CDE477800D4E39B /* Products */,
+				9A446551F907887229DAC55F /* Pods */,
+				C6AA36505F3F9E3F1B80AF11 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -58,6 +68,24 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		9A446551F907887229DAC55F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				9E998B79A4B7193BE43A7EAF /* Pods-EZY-Management.debug.xcconfig */,
+				14D87AC8C09AC22C84885F9F /* Pods-EZY-Management.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		C6AA36505F3F9E3F1B80AF11 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6896563682BAF9D4D2C4C0C2 /* libPods-EZY-Management.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -65,9 +93,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0F5BDE142CDE477A00D4E39B /* Build configuration list for PBXNativeTarget "EZY-Management" */;
 			buildPhases = (
+				51A03566C56EFE0225C0B1AB /* [CP] Check Pods Manifest.lock */,
 				0F5BDDFD2CDE477800D4E39B /* Sources */,
 				0F5BDDFE2CDE477800D4E39B /* Frameworks */,
 				0F5BDDFF2CDE477800D4E39B /* Resources */,
+				4C7E4A3364EBBBC658C62220 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -77,8 +107,6 @@
 				0F5BDE032CDE477800D4E39B /* EZY-Management */,
 			);
 			name = "EZY-Management";
-			packageProductDependencies = (
-			);
 			productName = "EZY-Management";
 			productReference = 0F5BDE012CDE477800D4E39B /* EZY-Management.app */;
 			productType = "com.apple.product-type.application";
@@ -127,6 +155,48 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4C7E4A3364EBBBC658C62220 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EZY-Management/Pods-EZY-Management-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-EZY-Management/Pods-EZY-Management-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-EZY-Management/Pods-EZY-Management-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		51A03566C56EFE0225C0B1AB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-EZY-Management-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		0F5BDDFD2CDE477800D4E39B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -140,6 +210,7 @@
 /* Begin XCBuildConfiguration section */
 		0F5BDE152CDE477A00D4E39B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 9E998B79A4B7193BE43A7EAF /* Pods-EZY-Management.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -168,6 +239,7 @@
 		};
 		0F5BDE162CDE477A00D4E39B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14D87AC8C09AC22C84885F9F /* Pods-EZY-Management.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
