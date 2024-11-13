@@ -22,7 +22,6 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Action for Login Button
     @IBAction func loginButtonTapped(_ sender: UIButton) {
-        // Check if both username and password fields are not empty
         guard let username = usernameTextField.text, !username.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
             showAlert(title: "Login Error", message: "Please enter both email and password.")
@@ -34,36 +33,39 @@ class ViewController: UIViewController, UITextFieldDelegate {
             if let error = error {
                 // Show alert if login fails
                 self.showAlert(title: "Login Failed", message: error.localizedDescription)
-                return // Exit early if login fails
-            }
-            
-            // Proceed only if authResult is not nil, indicating a successful login
-            guard authResult != nil else {
-                print("Login failed, no auth result returned.")
                 return
             }
             
             // If login is successful, retrieve and pass the user role
             self.getUserRole { role in
-                self.userRole = role // Store role for segue
-                
-                // Display popup with role-based message
-                self.showRolePopup(role: role)
+                self.userRole = role
+                self.performSegue(withIdentifier: "goToDashboard", sender: self)
             }
         }
     }
     
     // Function to retrieve the user's role from Firestore
     func getUserRole(completion: @escaping (String) -> Void) {
-        guard let userID = Auth.auth().currentUser?.uid else { return }
-        let db = Firestore.firestore()
+        guard let userID = Auth.auth().currentUser?.uid else {
+            print("Error: No current user ID found")
+            return
+        }
         
-        db.collection("users").document(userID).getDocument { document, error in
+        let db = Firestore.firestore()
+        let userRef = db.collection("users").document(userID)
+        
+        userRef.getDocument { document, error in
+            if let error = error {
+                print("Error fetching user role: \(error.localizedDescription)")
+                completion("unknown")
+                return
+            }
+            
             if let document = document, document.exists, let role = document.data()?["role"] as? String {
-                completion(role)
+                completion(role) // Role fetched successfully
             } else {
-                print("Error fetching user role: \(error?.localizedDescription ?? "Unknown error")")
-                completion("unknown") // Default to "unknown" if no role is found
+                print("Error: Role not found or document does not exist")
+                completion("unknown") // Default to unknown if no role is found
             }
         }
     }

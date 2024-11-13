@@ -25,26 +25,37 @@ class DashboardViewController: UIViewController {
     }
     
     func configureDashboard(for role: String?) {
-        guard let role = role else { return }
+        guard let role = role else {
+            showAlert(title: "Role Error", message: "User role could not be determined. Please contact support.")
+            return
+        }
         
-        // Disable all buttons initially
-        ownerButton.isEnabled = false
-        supervisorButton.isEnabled = false
-        managerButton.isEnabled = false
-        employeeButton.isEnabled = false
+        // Hide all buttons initially
+        ownerButton.isHidden = true
+        supervisorButton.isHidden = true
+        managerButton.isHidden = true
+        employeeButton.isHidden = true
 
-        // Enable the button(s) according to the role
+        // Show the appropriate button or directly navigate based on role
         switch role {
         case "owner":
-            ownerButton.isEnabled = true
+            ownerButton.isHidden = false
         case "supervisor":
-            supervisorButton.isEnabled = true
+            supervisorButton.isHidden = false
         case "manager":
-            managerButton.isEnabled = true
+            managerButton.isHidden = false
         case "employee":
-            employeeButton.isEnabled = true
+            employeeButton.isHidden = false
         default:
-            print("Unknown role")
+            showAlert(title: "Role Error", message: "User role is not recognized. Please contact support.")
         }
     }
+    // Inside DashboardViewController
+
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alert, animated: true)
+    }
+
 }
