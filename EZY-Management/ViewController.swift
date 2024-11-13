@@ -22,23 +22,33 @@ class ViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Action for Login Button
     @IBAction func loginButtonTapped(_ sender: UIButton) {
+        // Check if both username and password fields are not empty
         guard let username = usernameTextField.text, !username.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
-            print("Username or password field is empty")
+            showAlert(title: "Login Error", message: "Please enter both email and password.")
             return
         }
         
         // Firebase Authentication: Sign in with email and password
         Auth.auth().signIn(withEmail: username, password: password) { authResult, error in
             if let error = error {
-                print("Login failed: \(error.localizedDescription)")
+                // Show alert if login fails
+                self.showAlert(title: "Login Failed", message: error.localizedDescription)
+                return // Exit early if login fails
+            }
+            
+            // Proceed only if authResult is not nil, indicating a successful login
+            guard authResult != nil else {
+                print("Login failed, no auth result returned.")
                 return
             }
             
-            // Retrieve and pass user role after successful login
+            // If login is successful, retrieve and pass the user role
             self.getUserRole { role in
                 self.userRole = role // Store role for segue
-                self.performSegue(withIdentifier: "goToDashboard", sender: self)
+                
+                // Display popup with role-based message
+                self.showRolePopup(role: role)
             }
         }
     }
@@ -58,6 +68,36 @@ class ViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
+    // Show popup with role-based message
+    func showRolePopup(role: String) {
+        let roleMessage: String
+        
+        switch role {
+        case "owner":
+            roleMessage = "Owner login successful!"
+        case "supervisor":
+            roleMessage = "Supervisor login successful!"
+        case "manager":
+            roleMessage = "Manager login successful!"
+        case "employee":
+            roleMessage = "Employee login successful!"
+        default:
+            roleMessage = "Role could not be determined."
+        }
+        
+        let alert = UIAlertController(title: "Role Confirmation", message: roleMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            // After user acknowledges the role, navigate to the dashboard
+            if role != "unknown" {
+                self.performSegue(withIdentifier: "goToDashboard", sender: self)
+            } else {
+                self.showAlert(title: "Role Error", message: "User role could not be determined. Please contact support.")
+            }
+        }))
+        
+        self.present(alert, animated: true)
+    }
+    
     // Prepare for segue to pass the user role
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "goToDashboard" {
@@ -65,6 +105,13 @@ class ViewController: UIViewController, UITextFieldDelegate {
                 dashboardVC.userRole = userRole
             }
         }
+    }
+    
+    // MARK: - Helper Method to Show Alerts
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        self.present(alert, animated: true)
     }
     
     // MARK: - Helper Method to Dismiss Keyboard

@@ -19,7 +19,7 @@ class DashboardViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        print("Dashboard view loaded")
         // Configure dashboard based on user role
         configureDashboard(for: userRole)
     }
