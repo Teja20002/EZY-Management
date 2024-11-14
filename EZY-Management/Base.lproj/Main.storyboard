@@ -415,8 +415,27 @@
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" red="0.98083995329999996" green="0.33451049918907222" blue="0.23692487895083955" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </datePicker>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Task Name" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h0G-A5-EZb">
+                                <rect key="frame" x="72" y="193" width="233" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="2bH-yC-ZHa">
+                                <rect key="frame" x="76" y="456" width="240" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Normal"/>
+                                    <segment title="High"/>
+                                </segments>
+                                <color key="selectedSegmentTintColor" red="0.98083995329999996" green="0.46985521650000001" blue="0.42050010729999998" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            </segmentedControl>
+                            <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sjp-1Q-AKs">
+                                <rect key="frame" x="76" y="582" width="240" height="135"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </pickerView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JhL-pP-LVS">
-                                <rect key="frame" x="103" y="605" width="170" height="35"/>
+                                <rect key="frame" x="103" y="725" width="170" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="filled" title="Assign Task"/>
@@ -424,12 +443,6 @@
                                     <action selector="assignTaskButtonTapped:" destination="d8d-cZ-PR3" eventType="touchUpInside" id="aJt-Lz-Gxg"/>
                                 </connections>
                             </button>
-                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Task Name" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="h0G-A5-EZb">
-                                <rect key="frame" x="72" y="193" width="233" height="34"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
-                            </textField>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="pRd-lg-Wm4"/>
                         <color key="backgroundColor" red="0.20848414265731854" green="0.32492897727272729" blue="0.28551331877347458" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
@@ -437,6 +450,8 @@
                     <navigationItem key="navigationItem" id="mvJ-jS-4kB"/>
                     <connections>
                         <outlet property="deadlineDatePicker" destination="gjU-K2-h0G" id="mTt-a8-mHW"/>
+                        <outlet property="managerPicker" destination="sjp-1Q-AKs" id="0Sa-Xa-bWy"/>
+                        <outlet property="prioritySegmentControl" destination="2bH-yC-ZHa" id="65u-RZ-wcr"/>
                         <outlet property="taskDescriptionTextView" destination="zZ6-IZ-ASA" id="Bbu-SS-1lH"/>
                         <outlet property="taskNameTextField" destination="h0G-A5-EZb" id="C1y-WP-E1Q"/>
                     </connections>
@@ -516,14 +531,63 @@
                     <view key="view" contentMode="scaleToFill" id="Ugs-TZ-lMN">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="GF9-zn-6ZP">
+                                <rect key="frame" x="71" y="403" width="240" height="46"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </datePicker>
+                            <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Pal-d8-7wC">
+                                <rect key="frame" x="76" y="477" width="240" height="162"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            </pickerView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YxJ-Cp-c6K">
+                                <rect key="frame" x="132" y="647" width="129" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Assign Task"/>
+                                <connections>
+                                    <action selector="assignTaskButtonTapped:" destination="98C-cz-xje" eventType="touchUpInside" id="8Ic-PH-cMn"/>
+                                </connections>
+                            </button>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Task Name" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="vRu-He-xDU">
+                                <rect key="frame" x="96" y="125" width="201" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Task Description" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="amZ-FC-Jwg">
+                                <rect key="frame" x="96" y="213" width="201" height="34"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="DNA-5d-xrU">
+                                <rect key="frame" x="96" y="340" width="201" height="32"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="Normal"/>
+                                    <segment title="High"/>
+                                </segments>
+                                <color key="selectedSegmentTintColor" red="0.98083995329999996" green="0.46985521651848716" blue="0.42050010731439613" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                            </segmentedControl>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="rM7-LW-vkG"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" systemColor="systemTealColor"/>
                     </view>
-                    <navigationItem key="navigationItem" id="iLK-jx-2xS"/>
+                    <navigationItem key="navigationItem" id="iLK-jx-2xS">
+                        <nil key="title"/>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="deadlineDatePicker" destination="GF9-zn-6ZP" id="eUg-Pl-ZgH"/>
+                        <outlet property="descriptionTextField" destination="amZ-FC-Jwg" id="Guc-Z3-3mU"/>
+                        <outlet property="employeePicker" destination="Pal-d8-7wC" id="UFU-KO-Dem"/>
+                        <outlet property="prioritySegmentControl" destination="DNA-5d-xrU" id="BFq-Ea-SRl"/>
+                        <outlet property="taskNameTextField" destination="vRu-He-xDU" id="ccW-hu-Vaa"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="JYf-FP-0oT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7030" y="513"/>
+            <point key="canvasLocation" x="7029.7709923664115" y="512.67605633802816"/>
         </scene>
         <!--Assigned Tasks View Controller-->
         <scene sceneID="Gxd-ZZ-OPT">
@@ -536,6 +600,7 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="fbg-dM-PKL">
                                 <rect key="frame" x="1" y="0.0" width="392" height="852"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="sectionIndexBackgroundColor" red="0.15104864793518233" green="0.55606676061782889" blue="0.98083995329999996" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="TaskCell" id="I2S-Dt-Zj2">
                                         <rect key="frame" x="0.0" y="50" width="392" height="43.666667938232422"/>
@@ -623,7 +688,7 @@
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Fte-l5-qRt"/>
-                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" red="0.52194263435873678" green="0.66666668653488159" blue="0.37770618931660771" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                     </view>
                     <navigationItem key="navigationItem" id="ncG-zn-Tqd"/>
                     <connections>
@@ -698,6 +763,9 @@
         </systemColor>
         <systemColor name="systemRedColor">
             <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+        <systemColor name="systemTealColor">
+            <color red="0.18823529410000001" green="0.69019607839999997" blue="0.78039215689999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
