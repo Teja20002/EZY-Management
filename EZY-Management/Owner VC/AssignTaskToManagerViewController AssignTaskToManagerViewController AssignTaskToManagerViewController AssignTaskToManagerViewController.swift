@@ -37,6 +37,9 @@ class AssignTaskToManager: UIViewController, UIPickerViewDelegate, UIPickerViewD
                     let name = document.data()["name"] as? String ?? "Unknown"
                     return (userID, name)
                 } ?? []
+                if self.managers.isEmpty {
+                    print("No managers found")
+                }
                 self.managerPicker.reloadAllComponents() // Reload the picker view with manager names
             }
         }
@@ -69,8 +72,17 @@ class AssignTaskToManager: UIViewController, UIPickerViewDelegate, UIPickerViewD
         // Get the logged-in user's UID for the assignedBy field
         guard let ownerUserID = Auth.auth().currentUser?.uid else {
             print("Error: No user is logged in.")
+            showAlert(title: "Error", message: "You must be logged in to assign tasks.")
             return
         }
+
+        print("Creating Task with Data:")
+        print("Task Name: \(taskName)")
+        print("Description: \(description)")
+        print("Assigned By (UID): \(ownerUserID)")
+        print("Assigned To (UID): \(assignedTo)")
+        print("Priority: \(priority)")
+        print("Deadline: \(deadline)")
 
         let taskData: [String: Any] = [
             "taskID": newTaskRef.documentID,
@@ -87,8 +99,10 @@ class AssignTaskToManager: UIViewController, UIPickerViewDelegate, UIPickerViewD
         newTaskRef.setData(taskData) { error in
             if let error = error {
                 print("Error creating task: \(error.localizedDescription)")
+                self.showAlert(title: "Error", message: "Failed to create task. Please try again.")
             } else {
-                print("Task successfully created")
+                print("Task successfully created!")
+                self.showAlert(title: "Task Created", message: "Task has been successfully created.")
                 self.clearFields()
             }
         }
@@ -99,6 +113,10 @@ class AssignTaskToManager: UIViewController, UIPickerViewDelegate, UIPickerViewD
         taskNameTextField.text = ""
         taskDescriptionTextView.text = ""
         deadlineDatePicker.date = Date()
+        if !managers.isEmpty {
+            managerPicker.selectRow(0, inComponent: 0, animated: true)
+            selectedManagerID = managers[0].userID
+        }
     }
 
     // MARK: - UIPickerViewDelegate & UIPickerViewDataSource
@@ -118,6 +136,7 @@ class AssignTaskToManager: UIViewController, UIPickerViewDelegate, UIPickerViewD
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         // Set the selected manager user ID
         selectedManagerID = managers[row].userID
+        print("Selected Manager: \(managers[row].name) with ID: \(managers[row].userID)")
     }
 
     // Helper function to show alerts

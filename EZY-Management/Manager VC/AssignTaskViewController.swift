@@ -20,73 +20,111 @@ class AssignTaskViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Fetch the list of employees to display in the picker
         fetchEmployees()
-        
         employeePicker.delegate = self
         employeePicker.dataSource = self
     }
     
-    // Fetch the list of employees (user IDs with role "employee")
     func fetchEmployees() {
         let db = Firestore.firestore()
         
         db.collection("users").whereField("role", isEqualTo: "employee").getDocuments { (querySnapshot, error) in
             if let error = error {
                 print("Error fetching employees: \(error.localizedDescription)")
+                self.showAlert(title: "Error", message: "Could not load employee data. Please try again.")
             } else {
                 self.employees = querySnapshot?.documents.compactMap { document in
-                    // Fetch employee name and ID
-                    let name = document.data()["name"] as? String ?? "Unknown"
+                    guard let name = document.data()["name"] as? String else {
+                        print("Missing name for employee: \(document.documentID)")
+                        return nil
+                    }
                     let id = document.documentID
+                    print("Fetched Employee: \(name) with ID: \(id)")
                     return Employee(id: id, name: name)
                 } ?? []
                 
-                self.employeePicker.reloadAllComponents() // Reload the picker with employee names
+                if self.employees.isEmpty {
+                    self.showAlert(title: "No Employees", message: "No employees found to assign tasks.")
+                } else {
+                    self.selectedEmployeeID = self.employees.first?.id
+                }
+                self.employeePicker.reloadAllComponents()
             }
         }
     }
     
-    // Action to handle assigning the task when button is pressed
     @IBAction func assignTaskButtonTapped(_ sender: UIButton) {
         guard let taskName = taskNameTextField.text, !taskName.isEmpty,
               let description = descriptionTextField.text, !description.isEmpty,
               let selectedEmployeeID = selectedEmployeeID else {
-            showAlert(title: "Missing Information", message: "Please fill in all fields.")
+            showAlert(title: "Missing Information", message: "Please fill in all fields and select an employee.")
             return
         }
         
-        // Get priority value from the segmented control (0 for High Priority, 1 for Normal)
-        let priority = prioritySegmentControl.selectedSegmentIndex == 0 ? "High" : "Normal"
-        
-        // Define task data
-        let taskData: [String: Any] = [
-            "taskName": taskName,
-            "description": description,
-            "assignedTo": selectedEmployeeID,  // Employee selected by the manager
-            "assignedBy": Auth.auth().currentUser?.uid ?? "",  // The current logged-in manager
-            "createdAt": Timestamp(),
-            "deadline": deadlineDatePicker.date,
-            "priority": priority,  // High or Normal priority
-            "isCompleted": false
-        ]
-        
-        let db = Firestore.firestore()
-        
-        // Add task to Firestore
-        db.collection("tasks").addDocument(data: taskData) { error in
-            if let error = error {
-                print("Error assigning task: \(error.localizedDescription)")
-            } else {
-                print("Task successfully assigned!")
-                // Optionally: show an alert or navigate back
-                self.showAlert(title: "Task Assigned", message: "Task has been successfully assigned.")
+        fetchCurrentUserName { [weak self] userName in
+            guard let self = self else { return }
+            guard let userName = userName else {
+                self.showAlert(title: "Error", message: "Unable to fetch your name. Please try again.")
+                return
+            }
+            
+            let priority = self.prioritySegmentControl.selectedSegmentIndex == 0 ? "High" : "Normal"
+            
+            let taskData: [String: Any] = [
+                "taskName": taskName,
+                "description": description,
+                "assignedTo": selectedEmployeeID,
+                "assignedBy": userName,  // Store the name instead of UID
+                "createdAt": Timestamp(),
+                "deadline": self.deadlineDatePicker.date,
+                "priority": priority,
+                "isCompleted": false
+            ]
+            
+            let db = Firestore.firestore()
+            
+            db.collection("tasks").addDocument(data: taskData) { error in
+                if let error = error {
+                    print("Error assigning task: \(error.localizedDescription)")
+                    self.showAlert(title: "Error", message: "Could not assign task. Please try again.")
+                } else {
+                    print("Task successfully assigned!")
+                    self.showAlert(title: "Task Assigned", message: "Task has been successfully assigned.")
+                    self.clearFields()
+                }
             }
         }
     }
     
-    // Helper method to show alerts
+    func fetchCurrentUserName(completion: @escaping (String?) -> Void) {
+        guard let currentUserID = Auth.auth().currentUser?.uid else {
+            completion(nil)
+            return
+        }
+        
+        let db = Firestore.firestore()
+        db.collection("users").document(currentUserID).getDocument { document, error in
+            if let error = error {
+                print("Error fetching current user's name: \(error.localizedDescription)")
+                completion(nil)
+            } else if let document = document, document.exists {
+                let userName = document.data()?["name"] as? String
+                completion(userName)
+            } else {
+                print("User document not found.")
+                completion(nil)
+            }
+        }
+    }
+    
+    func clearFields() {
+        taskNameTextField.text = ""
+        descriptionTextField.text = ""
+        deadlineDatePicker.date = Date()
+        employeePicker.selectRow(0, inComponent: 0, animated: true)
+        selectedEmployeeID = employees.first?.id
+    }
+    
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -95,22 +133,20 @@ class AssignTaskViewController: UIViewController {
 }
 
 extension AssignTaskViewController: UIPickerViewDelegate, UIPickerViewDataSource {
-    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1  // Single column for employee selection
+        return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return employees.count  // Number of employees
+        return employees.count
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        // Display employee names in the picker
         return employees[row].name
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        // Set the selected employee ID
         selectedEmployeeID = employees[row].id
+        print("Selected Employee: \(employees[row].name) with ID: \(selectedEmployeeID ?? "")")
     }
 }
