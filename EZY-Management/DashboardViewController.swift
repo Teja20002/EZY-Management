@@ -1,12 +1,6 @@
-//
-//  DashboardViewController.swift
-//  EZY-Management
-//
-//  Created by Teja Manchala on 11/10/24.
-//
-
-import Foundation
 import UIKit
+import FirebaseFirestore
+import FirebaseAuth
 
 class DashboardViewController: UIViewController {
     
@@ -20,7 +14,6 @@ class DashboardViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         print("Dashboard view loaded")
-        // Configure dashboard based on user role
         configureDashboard(for: userRole)
     }
     
@@ -35,8 +28,8 @@ class DashboardViewController: UIViewController {
         supervisorButton.isHidden = true
         managerButton.isHidden = true
         employeeButton.isHidden = true
-
-        // Show the appropriate button or directly navigate based on role
+        
+        // Show the appropriate button and navigate based on role
         switch role {
         case "owner":
             ownerButton.isHidden = false
@@ -50,12 +43,37 @@ class DashboardViewController: UIViewController {
             showAlert(title: "Role Error", message: "User role is not recognized. Please contact support.")
         }
     }
-    // Inside DashboardViewController
-
+    
+    // MARK: - Button Actions for Navigation
+    @IBAction func ownerButtonTapped(_ sender: UIButton) {
+        navigateToViewController(identifier: "OwnerViewController")
+    }
+    
+    @IBAction func supervisorButtonTapped(_ sender: UIButton) {
+        navigateToViewController(identifier: "SupervisorViewController")
+    }
+    
+    @IBAction func managerButtonTapped(_ sender: UIButton) {
+        navigateToViewController(identifier: "ManagerViewController")
+    }
+    
+    @IBAction func employeeButtonTapped(_ sender: UIButton) {
+        navigateToViewController(identifier: "EmployeeViewController")
+    }
+    
+    func navigateToViewController(identifier: String) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        guard let destinationVC = storyboard.instantiateViewController(withIdentifier: identifier) as? UIViewController else {
+            print("Error: Could not instantiate view controller with identifier \(identifier)")
+            return
+        }
+        self.navigationController?.pushViewController(destinationVC, animated: true)
+    }
+    
+    // Helper function to show alerts
     func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true)
     }
-
 }

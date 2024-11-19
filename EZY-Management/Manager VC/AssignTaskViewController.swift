@@ -1,5 +1,6 @@
 import UIKit
-import Firebase
+import FirebaseAuth
+import FirebaseFirestore
 
 // Define a struct to store employee name and ID
 struct Employee {
@@ -63,18 +64,17 @@ class AssignTaskViewController: UIViewController {
         
         fetchCurrentUserName { [weak self] userName in
             guard let self = self else { return }
-            guard let userName = userName else {
-                self.showAlert(title: "Error", message: "Unable to fetch your name. Please try again.")
+            guard let userName = userName, let currentUserID = Auth.auth().currentUser?.uid else {
+                self.showAlert(title: "Error", message: "Unable to fetch your details. Please try again.")
                 return
             }
             
             let priority = self.prioritySegmentControl.selectedSegmentIndex == 0 ? "High" : "Normal"
-            
             let taskData: [String: Any] = [
                 "taskName": taskName,
                 "description": description,
                 "assignedTo": selectedEmployeeID,
-                "assignedBy": userName,  // Store the name instead of UID
+                "assignedBy": ["uid": currentUserID, "name": userName],  // Store UID and name
                 "createdAt": Timestamp(),
                 "deadline": self.deadlineDatePicker.date,
                 "priority": priority,
@@ -82,6 +82,9 @@ class AssignTaskViewController: UIViewController {
             ]
             
             let db = Firestore.firestore()
+            
+            print("Creating Task with Data:")
+            print(taskData)  // Debug log
             
             db.collection("tasks").addDocument(data: taskData) { error in
                 if let error = error {
@@ -95,6 +98,7 @@ class AssignTaskViewController: UIViewController {
             }
         }
     }
+
     
     func fetchCurrentUserName(completion: @escaping (String?) -> Void) {
         guard let currentUserID = Auth.auth().currentUser?.uid else {
