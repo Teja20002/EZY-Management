@@ -1,7 +1,7 @@
 import UIKit
 import Firebase
 
-// Rename Task struct to avoid ambiguity
+// Struct to represent tasks
 struct AssignedTask {
     let taskID: String
     let taskName: String
@@ -28,15 +28,12 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
     }
     
     func fetchEmployeeTasks() {
-        // Fetch current user ID
         guard let userID = Auth.auth().currentUser?.uid else {
             print("No user logged in")
             return
         }
         
         let db = Firestore.firestore()
-        
-        // Query tasks where the employee is assigned
         db.collection("tasks")
             .whereField("assignedTo", isEqualTo: userID)
             .getDocuments { (snapshot, error) in
@@ -47,13 +44,14 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
                         let data = document.data()
                         return AssignedTask(
                             taskID: document.documentID,
-                            taskName: data["taskName"] as? String ?? "",
-                            description: data["description"] as? String ?? "",
+                            taskName: data["taskName"] as? String ?? "No Task Name",
+                            description: data["description"] as? String ?? "No Description",
                             deadline: (data["deadline"] as? Timestamp)?.dateValue() ?? Date(),
                             isCompleted: data["isCompleted"] as? Bool ?? false
                         )
                     } ?? []
-                    self.tableView.reloadData() // Reload table with tasks
+                    print("Tasks fetched: \(self.tasks)")
+                    self.tableView.reloadData()
                 }
             }
     }
@@ -66,20 +64,39 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
-        
         let task = tasks[indexPath.row]
         
         // Configure cell with task details
         cell.textLabel?.text = task.taskName
-        cell.detailTextLabel?.text = "Deadline: \(task.deadline)"
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d, yyyy 'at' h:mm a"
+        cell.detailTextLabel?.text = "Deadline: \(formatter.string(from: task.deadline))"
         
         return cell
     }
     
     // MARK: - UITableViewDelegate Methods
 
-    // Handle task selection if needed
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // You can add functionality to show task details or allow task completion
+        let selectedTask = tasks[indexPath.row]
+        print("Selected Task: \(selectedTask)") // Debugging
+        performSegue(withIdentifier: "goToTaskDetails", sender: selectedTask)
+    }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "goToTaskDetails",
+           let taskDetailsVC = segue.destination as? TaskDetailsViewController,
+           let selectedTask = sender as? AssignedTask {
+            print("Passing Task to TaskDetailsViewController: \(selectedTask)") // Debugging
+            taskDetailsVC.task = [
+                "taskID": selectedTask.taskID,
+                "taskName": selectedTask.taskName,
+                "description": selectedTask.description,
+                "deadline": selectedTask.deadline,
+                "isCompleted": selectedTask.isCompleted
+            ]
+        } else {
+            print("Error: Failed to pass task data to TaskDetailsViewController.")
+        }
     }
 }

@@ -9,6 +9,8 @@ target 'EZY-Management' do
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
   pod 'Firebase/Database'
+  pod 'Firebase/Storage'
+
 
   # Set deployment target for all pods to avoid warnings
   post_install do |installer|
