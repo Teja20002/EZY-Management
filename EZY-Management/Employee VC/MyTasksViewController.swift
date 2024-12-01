@@ -11,11 +11,11 @@ struct AssignedTask {
 }
 
 class MyTasksViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
-    
+
     @IBOutlet weak var tableView: UITableView!
-    
+
     var tasks: [AssignedTask] = [] // Array to store tasks for the employee
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -26,13 +26,13 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
         // Fetch tasks for the current logged-in employee
         fetchEmployeeTasks()
     }
-    
+
     func fetchEmployeeTasks() {
         guard let userID = Auth.auth().currentUser?.uid else {
             print("No user logged in")
             return
         }
-        
+
         let db = Firestore.firestore()
         db.collection("tasks")
             .whereField("assignedTo", isEqualTo: userID)
@@ -42,6 +42,10 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
                 } else {
                     self.tasks = snapshot?.documents.compactMap { document in
                         let data = document.data()
+                        // Debugging: Log task data from Firebase
+                        print("Raw Task Data: \(data)")
+
+                        // Safely parse task details
                         return AssignedTask(
                             taskID: document.documentID,
                             taskName: data["taskName"] as? String ?? "No Task Name",
@@ -55,7 +59,7 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
                 }
             }
     }
-    
+
     // MARK: - UITableViewDataSource Methods
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -65,16 +69,16 @@ class MyTasksViewController: UIViewController, UITableViewDataSource, UITableVie
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath)
         let task = tasks[indexPath.row]
-        
+
         // Configure cell with task details
         cell.textLabel?.text = task.taskName
         let formatter = DateFormatter()
         formatter.dateFormat = "MMM d, yyyy 'at' h:mm a"
         cell.detailTextLabel?.text = "Deadline: \(formatter.string(from: task.deadline))"
-        
+
         return cell
     }
-    
+
     // MARK: - UITableViewDelegate Methods
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

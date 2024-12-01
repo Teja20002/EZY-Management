@@ -11,44 +11,60 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
     @IBOutlet weak var assignedByLabel: UILabel!
     @IBOutlet weak var photoCollectionView: UICollectionView!
     @IBOutlet weak var submitTaskButton: UIButton!
+    @IBOutlet weak var uploadPhotoButton: UIButton!
 
-    var task: [String: Any] = [:] // Task data passed to this view
+    var task: [String: Any]? {
+        didSet {
+            if isViewLoaded {
+                configureView()
+            }
+        }
+    }
+
     var uploadedPhotoURLs: [String] = [] // To store uploaded photo URLs
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Configure the view once, since task is already set
-        configureView()
         setupCollectionView()
+        configureView()
     }
 
     // MARK: - Setup Methods
     private func setupCollectionView() {
         photoCollectionView.dataSource = self
         photoCollectionView.delegate = self
-        photoCollectionView.register(UINib(nibName: "PhotoCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "PhotoCell")
+        let nib = UINib(nibName: "PhotoCollectionViewCell", bundle: nil)
+        photoCollectionView.register(nib, forCellWithReuseIdentifier: "PhotoCell")
+        print("CollectionView setup complete with nib registration.")
     }
 
     // MARK: - Configure View with Task Data
     private func configureView() {
+        guard let task = task else {
+            print("Task data is nil, skipping view configuration.")
+            return
+        }
+
         print("Configuring view with task: \(task)")
 
-        // Task Name
         taskNameLabel.text = task["taskName"] as? String ?? "No Task Name"
-
-        // Task Description
         taskDescriptionLabel.text = task["description"] as? String ?? "No Description"
-
-        // Deadline
+        
         if let deadline = task["deadline"] as? Date {
+            deadlineLabel.text = formattedDate(deadline)
+        } else if let timestamp = task["deadline"] as? Timestamp {
+            let deadline = timestamp.dateValue()
             deadlineLabel.text = formattedDate(deadline)
         } else {
             deadlineLabel.text = "No Deadline"
         }
 
-        // Assigned By
-        assignedByLabel.text = task["assignedBy"] as? String ?? "Assigned By: Unknown"
+        if let assignedBy = task["assignedBy"] as? [String: Any],
+           let name = assignedBy["name"] as? String {
+            assignedByLabel.text = "Assigned By: \(name)"
+        } else {
+            assignedByLabel.text = task["assignedBy"] as? String ?? "Assigned By: Unknown"
+        }
     }
 
     private func formattedDate(_ date: Date) -> String {
@@ -59,15 +75,24 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
 
     // MARK: - Upload Photo
     @IBAction func uploadPhotoTapped(_ sender: UIButton) {
-        let picker = UIImagePickerController()
-        picker.delegate = self
-        picker.mediaTypes = ["public.image"]
-        picker.allowsEditing = true
-        present(picker, animated: true)
+        print("Upload Photo button tapped!")
+
+        if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
+            let picker = UIImagePickerController()
+            picker.delegate = self
+            picker.mediaTypes = ["public.image"]
+            picker.allowsEditing = true
+            present(picker, animated: true) {
+                print("Image picker presented!")
+            }
+        } else {
+            print("Photo library is not available.")
+        }
     }
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let image = info[.editedImage] as? UIImage {
+            print("Image selected for upload!")
             uploadPhoto(image: image)
         }
         dismiss(animated: true)
@@ -83,6 +108,7 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
             return
         }
 
+        print("Uploading photo...")
         photoRef.putData(imageData, metadata: nil) { [weak self] _, error in
             if let error = error {
                 print("Error uploading photo: \(error.localizedDescription)")
@@ -99,17 +125,19 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
                 DispatchQueue.main.async {
                     self?.photoCollectionView.reloadData()
                 }
+                print("Photo uploaded successfully: \(url.absoluteString)")
             }
         }
     }
 
     // MARK: - Submit Task
     @IBAction func submitTaskTapped(_ sender: UIButton) {
+        print("Submit Task Button Tapped")
         submitTask()
     }
 
     private func submitTask() {
-        guard let taskID = task["taskID"] as? String else {
+        guard let taskID = task?["taskID"] as? String else {
             print("Error: Task ID missing.")
             return
         }
@@ -141,14 +169,24 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
         }
 
         let photoURL = uploadedPhotoURLs[indexPath.item]
+        print("Setting image for photo URL: \(photoURL)")
+
         if let url = URL(string: photoURL) {
             DispatchQueue.global().async {
                 if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                     DispatchQueue.main.async {
                         cell.photoImageView.image = image
                     }
+                } else {
+                    print("Error: Failed to load image from URL \(photoURL)")
+                    DispatchQueue.main.async {
+                        cell.photoImageView.image = UIImage(named: "placeholder")
+                    }
                 }
             }
+        } else {
+            print("Error: Invalid URL \(photoURL)")
+            cell.photoImageView.image = UIImage(named: "placeholder")
         }
 
         return cell
@@ -158,4 +196,9 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
 // MARK: - Custom UICollectionViewCell
 class PhotoCollectionViewCell: UICollectionViewCell {
     @IBOutlet weak var photoImageView: UIImageView!
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        photoImageView.image = UIImage(named: "placeholder")
+    }
 }

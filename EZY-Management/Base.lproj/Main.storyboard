@@ -803,6 +803,15 @@
                                     </collectionViewCell>
                                 </cells>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="66V-9q-W1a">
+                                <rect key="frame" x="133" y="605" width="128" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Upload Photo"/>
+                                <connections>
+                                    <action selector="uploadPhotoTapped:" destination="k5c-nv-ISH" eventType="touchUpInside" id="aQr-8E-eXD"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="byP-6h-eGU"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -815,6 +824,7 @@
                         <outlet property="submitTaskButton" destination="g2X-W1-vX6" id="3Qp-d2-b6I"/>
                         <outlet property="taskDescriptionLabel" destination="1yM-8U-n3l" id="kW9-Gr-oJo"/>
                         <outlet property="taskNameLabel" destination="LsJ-z1-90x" id="WEY-vr-RN1"/>
+                        <outlet property="uploadPhotoButton" destination="66V-9q-W1a" id="CbR-Z6-P62"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mtI-mm-fbd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
