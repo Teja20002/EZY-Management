@@ -164,10 +164,12 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        print("Dequeuing cell for index: \(indexPath.item)")
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCollectionViewCell else {
             fatalError("Error: Unable to dequeue PhotoCollectionViewCell.")
         }
 
+        print("Cell dequeued successfully.")
         let photoURL = uploadedPhotoURLs[indexPath.item]
         print("Setting image for photo URL: \(photoURL)")
 
@@ -175,7 +177,12 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
             DispatchQueue.global().async {
                 if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                     DispatchQueue.main.async {
-                        cell.photoImageView.image = image
+                        if cell.photoImageView == nil {
+                            print("Error: photoImageView is nil!")
+                        } else {
+                            print("Successfully setting the image.")
+                            cell.photoImageView.image = image
+                        }
                     }
                 } else {
                     print("Error: Failed to load image from URL \(photoURL)")
@@ -188,17 +195,8 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
             print("Error: Invalid URL \(photoURL)")
             cell.photoImageView.image = UIImage(named: "placeholder")
         }
-
+        
+        
         return cell
-    }
-}
-
-// MARK: - Custom UICollectionViewCell
-class PhotoCollectionViewCell: UICollectionViewCell {
-    @IBOutlet weak var photoImageView: UIImageView!
-
-    override func prepareForReuse() {
-        super.prepareForReuse()
-        photoImageView.image = UIImage(named: "placeholder")
     }
 }
