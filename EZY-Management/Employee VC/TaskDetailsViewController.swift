@@ -82,9 +82,7 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
             picker.delegate = self
             picker.mediaTypes = ["public.image"]
             picker.allowsEditing = true
-            present(picker, animated: true) {
-                print("Image picker presented!")
-            }
+            present(picker, animated: true)
         } else {
             print("Photo library is not available.")
         }
@@ -92,7 +90,6 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
 
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         if let image = info[.editedImage] as? UIImage {
-            print("Image selected for upload!")
             uploadPhoto(image: image)
         }
         dismiss(animated: true)
@@ -108,7 +105,6 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
             return
         }
 
-        print("Uploading photo...")
         photoRef.putData(imageData, metadata: nil) { [weak self] _, error in
             if let error = error {
                 print("Error uploading photo: \(error.localizedDescription)")
@@ -125,14 +121,12 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
                 DispatchQueue.main.async {
                     self?.photoCollectionView.reloadData()
                 }
-                print("Photo uploaded successfully: \(url.absoluteString)")
             }
         }
     }
 
     // MARK: - Submit Task
     @IBAction func submitTaskTapped(_ sender: UIButton) {
-        print("Submit Task Button Tapped")
         submitTask()
     }
 
@@ -144,18 +138,38 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
 
         let db = Firestore.firestore()
         db.collection("tasks").document(taskID).updateData([
-            "isCompleted": true,
+            "isSubmitted": true,
             "uploadedPhotos": uploadedPhotoURLs
         ]) { error in
             if let error = error {
-                print("Error updating task: \(error.localizedDescription)")
+                print("Error submitting task: \(error.localizedDescription)")
+                self.showAlert(title: "Error", message: "Failed to submit the task. Please try again.")
             } else {
-                print("Task marked as completed!")
+                print("Task submitted successfully!")
                 DispatchQueue.main.async {
-                    self.navigationController?.popViewController(animated: true)
+                    self.showAlert(title: "Success", message: "Task submitted for review.") {
+                        self.closeScreen()
+                    }
                 }
             }
         }
+    }
+
+    private func closeScreen() {
+        if let navigationController = self.navigationController {
+            navigationController.popViewController(animated: true)
+        } else {
+            self.dismiss(animated: true, completion: nil)
+        }
+    }
+
+    // MARK: - Alert Helper
+    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+            completion?()
+        }))
+        present(alert, animated: true)
     }
 
     // MARK: - Collection View Data Source
@@ -164,39 +178,24 @@ class TaskDetailsViewController: UIViewController, UIImagePickerControllerDelega
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        print("Dequeuing cell for index: \(indexPath.item)")
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PhotoCell", for: indexPath) as? PhotoCollectionViewCell else {
             fatalError("Error: Unable to dequeue PhotoCollectionViewCell.")
         }
 
-        print("Cell dequeued successfully.")
         let photoURL = uploadedPhotoURLs[indexPath.item]
-        print("Setting image for photo URL: \(photoURL)")
-
         if let url = URL(string: photoURL) {
             DispatchQueue.global().async {
                 if let data = try? Data(contentsOf: url), let image = UIImage(data: data) {
                     DispatchQueue.main.async {
-                        if cell.photoImageView == nil {
-                            print("Error: photoImageView is nil!")
-                        } else {
-                            print("Successfully setting the image.")
-                            cell.photoImageView.image = image
-                        }
+                        cell.photoImageView.image = image
                     }
                 } else {
-                    print("Error: Failed to load image from URL \(photoURL)")
                     DispatchQueue.main.async {
                         cell.photoImageView.image = UIImage(named: "placeholder")
                     }
                 }
             }
-        } else {
-            print("Error: Invalid URL \(photoURL)")
-            cell.photoImageView.image = UIImage(named: "placeholder")
         }
-        
-        
         return cell
     }
 }
